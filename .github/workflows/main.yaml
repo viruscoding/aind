@@ -13,7 +13,7 @@ jobs:
     - run: ./hack/translate-dockerfile-runopt-directive.sh < Dockerfile | DOCKER_BUILDKIT=1 docker build -f - -t aind/aind:local .
     - run: sudo ./hack/install-kmod.sh
     - run: docker run -td --name aind --privileged -p 5900:5900 -v /lib/modules:/lib/modules:ro aind/aind:local
-    - run: timeout 60 sh -exc "until docker exec aind pgrep -f org.anbox.appmgr; do sleep 10; done"
+    - run: timeout 300 sh -exc "until docker exec aind pgrep -f org.anbox.appmgr; do sleep 10; done"
 # diagnosis
     - run: docker exec aind ps -ef
       if: always()
