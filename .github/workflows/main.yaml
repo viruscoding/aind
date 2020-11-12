@@ -5,10 +5,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       env:
-        release=1.0.0
-        image=${{ secrets.IMAGE }}
-        image_version=${image}:${release}
-#        image_latest=${image}:latest
+        release: 1.0.0
+        image: ${{ secrets.IMAGE }}
+        image_version: ${image}:${release}
+        image_latest: ${image}:latest
     - uses: actions/checkout@v2
 # host info
     - run: docker info
@@ -34,7 +34,7 @@ jobs:
       if: success()
     - run: |
       docker push ${image_version}
-#      docker push ${image_latest}
+      docker push ${image_latest}
       if: success()
 
 
