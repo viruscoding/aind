@@ -30,11 +30,11 @@ jobs:
       if: success()
     - run: docker tag ${image_version} ${image_latest}
       if: success()
-    - run: |
+    - run: docker push xiaoming996/aind-ga
+      if: success()
 #      docker push ${image_version}
 #      docker push ${image_latest}
-      docker push xiaoming996/aind-ga
-      if: success()
+
 
 
 
