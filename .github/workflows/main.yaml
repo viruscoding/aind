@@ -6,7 +6,7 @@ jobs:
     steps:
       env:
         release=1.0.0
-        image=${{ IMAGE }}
+        image=${{ secrets.IMAGE }}
         image_version=${image}:${release}
         image_latest=${image}:latest
     - uses: actions/checkout@v2
