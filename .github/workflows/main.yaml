@@ -4,21 +4,39 @@ jobs:
   test-main:
     runs-on: ubuntu-latest
     steps:
+      env:
+        release=1.0.0
+        image=${{ IMAGE }}
+        image_version=${image}:${release}
+        image_latest=${image}:latest
     - uses: actions/checkout@v2
-# host info
+    # host info
     - run: docker info
     - run: docker version
     - run: cat /proc/cpuinfo
-# test
-    - run: ./hack/translate-dockerfile-runopt-directive.sh < Dockerfile | DOCKER_BUILDKIT=1 docker build -f - -t aind/aind:local .
+    # test
+    - run: ./hack/translate-dockerfile-runopt-directive.sh < Dockerfile | DOCKER_BUILDKIT=1 docker build -f - -t ${image_version} .
     - run: sudo ./hack/install-kmod.sh
-    - run: docker run -td --name aind --privileged -p 5900:5900 -v /lib/modules:/lib/modules:ro aind/aind:local
+    - run: docker run -td --name aind --privileged -p 5900:5900 -v /lib/modules:/lib/modules:ro ${image_version}
     - run: timeout 300 sh -exc "until docker exec aind pgrep -f org.anbox.appmgr; do sleep 10; done"
-# diagnosis
+    # diagnosis
     - run: docker exec aind ps -ef
       if: always()
     - run: docker logs aind
       if: always()
     - run: docker exec aind cat /var/lib/anbox/logs/console.log
       if: always()
+
+    # docker push
+    - run: docker login --username=${{ secrets.DOCKERHUB_USERNAME }} --password=${{ secrets.DOCKERHUB_PASSWORD }}
+      if: success()
+    - run: docker tag ${image_version} ${image_latest}
+      if: success()
+    - run: |
+      docker push ${image_version}
+      docker push ${image_latest}
+      if: success()
+
+
+
 # TODO: capture screenshot and upload as an artifact
