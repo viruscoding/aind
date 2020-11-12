@@ -12,6 +12,7 @@ ARG ANDROID_IMAGE=https://github.com/AkihiroSuda/anbox-android-images-mirror/rel
 # https://build.anbox.io/android-images/2018/07/19/android_amd64.img.sha256sum
 ARG ANDROID_IMAGE_SHA256=6b04cd33d157814deaf92dccf8a23da4dc00b05ca6ce982a03830381896a8cca
 
+# build anbox
 FROM ${BASE} AS anbox
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && \
@@ -62,6 +63,7 @@ RUN git config user.email "nobody@example.com" && \
 RUN ./scripts/build.sh && \
   cp -f ./build/src/anbox /anbox-binary
 
+# build android image
 FROM ${BASE} AS android-img
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && \
@@ -72,6 +74,15 @@ ARG ANDROID_IMAGE_SHA256
 RUN curl --retry 10 -L -o /android.img $ANDROID_IMAGE \
     && echo $ANDROID_IMAGE_SHA256 /android.img | sha256sum --check
 
+# 安装arm兼容库和google apps
+RUN apt-get update && \
+  apt-get install -y lzip squashfs-tools unzip wget curl tar
+ADD src/install-playstore.sh /install-playstore.sh
+RUN cd / && \
+  chmod +x install-playstore.sh && \
+  ./install-playstore.sh
+
+# build base image
 FROM ${BASE}
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && \
