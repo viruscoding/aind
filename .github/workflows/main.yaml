@@ -5,10 +5,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       env:
-        release: 1.0.0
-        image: ${{ secrets.IMAGE }}
-        image_version: ${image}:${release}
-        image_latest: ${image}:latest
+        image_version: xiaoming996/aind-ga:1.0.0
+        image_latest: xiaoming996/aind-ga:latest
     - uses: actions/checkout@v2
 # host info
     - run: docker info
